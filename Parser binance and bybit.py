@@ -1,8 +1,12 @@
 import aiohttp
+import logging
 import datetime
 import asyncio
 import psycopg2 as ps
 from typing import Optional, Dict, Any, List
+
+logger = logging.getLogger("logger")
+logger.setLevel(logging.DEBUG)
 
 PARAMS = ("BTCUSDT", "ETHUSDT", "BNBUSDT", "XRPUSDT", "DOGEUSDT")
 
@@ -13,14 +17,18 @@ write_file = "crypto_curses.txt"
 
 
 async def binance_price(session: aiohttp.ClientSession, pair: str) -> Optional[Dict[str, Any]]:
-    """
-    Получаем цену крипты с Binance.
+    """Class methods are similar to regular functions
+    Note:
+        Получаем цену крипты с Binance.
 
-    :param session: Сессия HTTP для запросов
-    :param pair: Символ крипты
-    :return: JSON-ответ с ценой или None в случае ошибки.
+    Args:
+        param session: Сессия HTTP для запросов
+        param pair: Символ крипты
+    Returns:
+        JSON-ответ с ценой или None в случае ошибки.
+
     """
-    params = {'symbol': pair}
+    params = {"symbol": pair}
     async with session.get(binance_url, params=params) as response:
         if response.status == 200:
             return await response.json()
@@ -30,14 +38,18 @@ async def binance_price(session: aiohttp.ClientSession, pair: str) -> Optional[D
 
 
 async def bybit_price(session: aiohttp.ClientSession, pair: str) -> Optional[Dict[str, Any]]:
-    """
-    Получаем цену крипты с Bybit.
+    """Class methods are similar to regular functions
+    Note:
+        Получаем цену крипты с Bybit.
 
-    :param session: Сессия HTTP для запросов
-    :param pair: Символ крипты
-    :return: JSON-ответ с ценой или None в случае ошибки.:
+    Args:
+        param session: Сессия HTTP для запросов
+        param pair: Символ крипты
+    Returns:
+        JSON-ответ с ценой или None в случае ошибки.
+
     """
-    params = {'symbol': pair}
+    params = {"symbol": pair}
     async with session.get(bybit_url, params=params) as response:
         if response.status == 200:
             return await response.json()
@@ -48,8 +60,10 @@ async def bybit_price(session: aiohttp.ClientSession, pair: str) -> Optional[Dic
 
 async def price() -> None:
     """
-    Эта функция выполняет запрос цен на криптовалюты с
-    бирж Binance и Bybit, а затем сохраняет их в текстовый файл.
+    Note:
+        Эта функция выполняет запрос цен на криптовалюты с
+        бирж Binance и Bybit, а затем сохраняет их в текстовый файл.
+
     """
     async with aiohttp.ClientSession() as session:
         while True:
@@ -60,14 +74,14 @@ async def price() -> None:
 
                 if binance:
                     prices.append(
-                        f"Binance: {pair} - Price: {binance['price']}  - Time: {datetime.datetime.now()}\n"
+                        f"Binance: {pair} - Price: {binance["price"]}  - Time: {datetime.datetime.now()}\n"
                     )
 
                 if bybit:
                     prices.append(
-                        f"Bybit: {pair} - Price: {bybit['lastPrice']}  - Time: {datetime.datetime.now()}\n"
+                        f"Bybit: {pair} - Price: {bybit["lastPrice"]}  - Time: {datetime.datetime.now()}\n"
                     )
-            with open(write_file, 'a') as file:
+            with open(write_file, "a") as file:
                 file.writelines(prices)
 
             print("Prices ready to learn.")
