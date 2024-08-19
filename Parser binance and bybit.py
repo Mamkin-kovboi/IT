@@ -2,11 +2,11 @@ import aiohttp
 import logging
 import datetime
 import asyncio
-import psycopg2 as ps
 from typing import Optional, Dict, Any, List
 
+# Настройка логгирования
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("logger")
-logger.setLevel(logging.DEBUG)
 
 PARAMS = ("BTCUSDT", "ETHUSDT", "BNBUSDT", "XRPUSDT", "DOGEUSDT")
 
@@ -15,55 +15,53 @@ bybit_url = "https://api.bybit.com/spot/v3/public/quote/ticker/price"
 
 write_file = "crypto_curses.txt"
 
-
 async def binance_price(session: aiohttp.ClientSession, pair: str) -> Optional[Dict[str, Any]]:
-    """Class methods are similar to regular functions
-    Note:
-        Получаем цену крипты с Binance.
+    """Получает цену криптовалюты с биржи Binance.
 
     Args:
-        param session: Сессия HTTP для запросов
-        param pair: Символ крипты
-    Returns:
-        JSON-ответ с ценой или None в случае ошибки.
+        session (aiohttp.ClientSession): Сессия HTTP для выполнения запросов.
+        pair (str): Символ криптовалюты (например, 'BTCUSDT').
 
+    Returns:
+        Optional[Dict[str, Any]]: JSON-ответ с ценой или None в случае ошибки.
     """
     params = {"symbol": pair}
     async with session.get(binance_url, params=params) as response:
         if response.status == 200:
-            return await response.json()
+            result = await response.json()
+            logger.info(f"Получена цена для {pair} с Binance: {result["price"]}")
+            return result
         else:
-            print(f"Error Binance: {response.status} - {await response.json()}")
+            error_response = await response.json()
+            logger.error(f"Ошибка Binance: {response.status} - {error_response}")
             return None
 
-
 async def bybit_price(session: aiohttp.ClientSession, pair: str) -> Optional[Dict[str, Any]]:
-    """Class methods are similar to regular functions
-    Note:
-        Получаем цену крипты с Bybit.
+    """Получает цену криптовалюты с биржи Bybit.
 
     Args:
-        param session: Сессия HTTP для запросов
-        param pair: Символ крипты
-    Returns:
-        JSON-ответ с ценой или None в случае ошибки.
+        session (aiohttp.ClientSession): Сессия HTTP для выполнения запросов.
+        pair (str): Символ криптовалюты (например, 'BTCUSDT').
 
+    Returns:
+        Optional[Dict[str, Any]]: JSON-ответ с ценой или None в случае ошибки.
     """
     params = {"symbol": pair}
     async with session.get(bybit_url, params=params) as response:
         if response.status == 200:
-            return await response.json()
+            result = await response.json()
+            logger.info(f"Получена цена для {pair} с Bybit: {result["lastPrice"]}")
+            return result
         else:
-            print(f"Error Bybit: {response.status} - {await response.json()}")
+            error_response = await response.json()
+            logger.error(f"Ошибка Bybit: {response.status} - {error_response}")
             return None
 
-
 async def price() -> None:
-    """
-    Note:
-        Эта функция выполняет запрос цен на криптовалюты с
-        бирж Binance и Bybit, а затем сохраняет их в текстовый файл.
-
+    """Запрашивает цены на криптовалюты с бирж Binance и Bybit и сохраняет их в текстовый файл.
+    
+    Returns:
+        None
     """
     async with aiohttp.ClientSession() as session:
         while True:
@@ -81,13 +79,13 @@ async def price() -> None:
                     prices.append(
                         f"Bybit: {pair} - Price: {bybit["lastPrice"]}  - Time: {datetime.datetime.now()}\n"
                     )
-            with open(write_file, "a") as file:
-                file.writelines(prices)
-
-            print("Prices ready to learn.")
+            
+            if prices:
+                with open(write_file, "a") as file:
+                    file.writelines(prices)
+                logger.info("Цены готовы и сохранены в файл.")
 
             await asyncio.sleep(15)
-
 
 if __name__ == "__main__":
     asyncio.run(price())
