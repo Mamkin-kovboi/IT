@@ -14,13 +14,13 @@ class CurrencyPrice(BaseModel):
     source: str
     datetime: datetime
 
-#Модель для бирж
+# Модель для бирж
 class Exchanger(BaseModel):
     exchanger_id: int
     name: str
     api_url: str
 
-#Модель для валютных пар
+# Модель для валютных пар
 class CurrencyPair(BaseModel):
     currency_pair_id: int
     currency_from_id: int
