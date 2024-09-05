@@ -1,7 +1,6 @@
-from datetime import datetime
-from typing import Optional
-from config import DATABASE_CONFIG
 import asyncpg
+from config import DATABASE_CONFIG
+from models import CurrencyPrice 
 
 class DatabaseManager:
     def __init__(self):
@@ -28,9 +27,13 @@ class DatabaseManager:
         row = await self.conn.fetchrow(query, exchange_name)
         return row['api_url'] if row else None
 
-    async def save_price(self, currency_pair_id: int, price: float, source: str):
+    async def save_price(self, currency_price: CurrencyPrice):
         query = """
             INSERT INTO currency_price (currency_pair_id, price, source, datetime)
             VALUES ($1, $2, $3, $4);
         """
-        await self.conn.execute(query, currency_pair_id, price, source, datetime.datetime.now())
+        await self.conn.execute(query, 
+                                 currency_price.currency_pair_id,
+                                 currency_price.price,
+                                 currency_price.source,
+                                 currency_price.datetime)
