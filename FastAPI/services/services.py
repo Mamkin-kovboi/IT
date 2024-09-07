@@ -43,13 +43,13 @@ class CurrencyService:
                 )
                 await self.db_manager.save_price(currency_price)
 
-            bybit_url = await self.db_manager.fetch_exchange_url('Bybit')
-            price_data = await self.get_bybit_price(pair, bybit_url)
+            binance_url = await self.db_manager.fetch_exchange_url('Binance')
+            price_data = await self.get_bybit_price(pair, binance_url)
             if price_data:
                 currency_price = CurrencyPrice(
                     currency_pair_id=currency_pair_id,
                     price=float(price_data['price']),
-                    source="Bybit",
+                    source="Binance",
                     datetime=datetime.now()
                 )
                 await self.db_manager.save_price(currency_price)
@@ -67,10 +67,10 @@ class CurrencyService:
             print(f"Error fetching data from Binance: {e}")
             return None
 
-    async def get_bybit_price(self, pair: str, bybit_url: str):
+    async def get_bybit_price(self, pair: str, binance_url: str):
         params = {'symbol': pair}
         try:
-            async with self.session.get(bybit_url, params=params, ssl=False) as response:
+            async with self.session.get(binance_url, params=params, ssl=False) as response:
                 if response.status == 200:
                     return await response.json()
                 else:
