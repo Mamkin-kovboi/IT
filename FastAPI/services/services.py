@@ -160,5 +160,4 @@ class currencyservice:
             Optional[Dict[str, Any]]: Словарь с информацией о последней цене,
             или None, если цена не доступна.
         """
-        # Логика для извлечения последней цены по валютной паре
-        pass
+        return await self.db_manager.fetch_currency_pairs()
