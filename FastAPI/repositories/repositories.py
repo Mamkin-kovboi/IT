@@ -1,56 +1,82 @@
-from typing import Optional
-
+from typing import Optional, List
 import asyncpg
+import logging
 from config import DATABASE_CONFIG
 from models import currencyprice
 
+# Настройка логирования
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
 class DatabaseManager:
-    def __init__(self)-> None:
+    def __init__(self) -> None:
         self.conn = None
 
-    async def connect(self)-> None:
-        """Соединие с дб
-        """
-        self.conn = await asyncpg.connect(**DATABASE_CONFIG)
+    async def connect(self) -> None:
+        """Соединение с дб"""
+        try:
+            self.conn = await asyncpg.connect(**DATABASE_CONFIG)
+            logger.info("Успешное соединение с базой данных.")
+        except Exception as e:
+            logger.error(f"Ошибка при соединении с базой данных: {e}")
 
-    async def close(self)-> None:
-        """Закрытие бд
-        """
-        await self.conn.close()
+    async def close(self) -> None:
+        """Закрытие бд"""
+        if self.conn:
+            await self.conn.close()
+            logger.info("Соединение с базой данных закрыто.")
 
-    async def fetch_currency_pairs(self):
+    async def fetch_currency_pairs(self) -> List[str]:
         """Получает все валютные пары из базы данных.
+
         Returns:
             List[str]: Список имен валютных пар.
         """
         query = "SELECT name FROM currency;"
         rows = await self.conn.fetch(query)
+        logger.info("Получены валютные пары из базы данных.")
         return [row['name'] for row in rows]
 
     async def fetch_currency_pair_id(self, pair: str) -> Optional[int]:
         """Получает id валютной пары по ее имени.
+
         Args:
             pair (str): Имя валютной пары.
+
         Returns:
             Optional[int]: Идентификатор валютной пары или None, если не найдено.
         """
         query = "SELECT id FROM currency WHERE name = $1;"
         row = await self.conn.fetchrow(query, pair)
-        return row['id'] if row else None
+        if row:
+            logger.info(f"Валютная пара '{pair}' найдена, ID: {row['id']}.")
+            return row['id']
+        else:
+            logger.warning(f"Валютная пара '{pair}' не найдена.")
+            return None
 
     async def fetch_exchange_url(self, exchange_name: str) -> Optional[str]:
         """Получает URL API Биржи.
+
         Args:
             exchange_name (str): Имя биржи.
+
         Returns:
             Optional[str]: URL API биржи или None, если обменник не найден.
         """
         query = "SELECT api_url FROM exchanger WHERE name = $1;"
         row = await self.conn.fetchrow(query, exchange_name)
-        return row['api_url'] if row else None
+        if row:
+            logger.info(f"URL API для биржи '{exchange_name}' получен.")
+            return row['api_url']
+        else:
+            logger.warning(f"Биржа '{exchange_name}' не найдена.")
+            return None
 
-    async def save_price(self, currency_price: currencyprice)-> None:
+    async def save_price(self, currency_price: currencyprice) -> None:
         """Сохраняет информацию о ценах валют в базе данных.
+
         Args:
             currency_price (currencyprice): Объект, содержащий информацию о ценах валют.
         """
@@ -59,7 +85,8 @@ class DatabaseManager:
             VALUES ($1, $2, $3, $4);
         """
         await self.conn.execute(query,
-                                 currency_price.currency_pair_id,
-                                 currency_price.price,
-                                 currency_price.source,
-                                 currency_price.datetime)
+                                currency_price.currency_pair_id,
+                                currency_price.price,
+                                currency_price.source,
+                                currency_price.datetime)
+        logger.info(f"Цены валют сохранены: {currency_price}")
