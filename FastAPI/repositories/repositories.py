@@ -2,7 +2,7 @@ from typing import Optional, List
 import asyncpg
 import logging
 from config import DATABASE_CONFIG
-from models import currencyprice
+from models import CurrencyPrice
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -33,7 +33,7 @@ class DatabaseManager:
         Returns:
             List[str]: Список имен валютных пар.
         """
-        query = "SELECT name FROM currency;"
+        query = "select name from currency;"
         rows = await self.conn.fetch(query)
         logger.info("Получены валютные пары из базы данных.")
         return [row['name'] for row in rows]
@@ -47,7 +47,7 @@ class DatabaseManager:
         Returns:
             Optional[int]: Идентификатор валютной пары или None, если не найдено.
         """
-        query = "SELECT id FROM currency WHERE name = $1;"
+        query = "select id from currency where name = $1;"
         row = await self.conn.fetchrow(query, pair)
         if row:
             logger.info(f"Валютная пара '{pair}' найдена, ID: {row['id']}.")
@@ -65,7 +65,7 @@ class DatabaseManager:
         Returns:
             Optional[str]: URL API биржи или None, если обменник не найден.
         """
-        query = "SELECT api_url FROM exchanger WHERE name = $1;"
+        query = "select api_url from exchanger where name = $1;"
         row = await self.conn.fetchrow(query, exchange_name)
         if row:
             logger.info(f"URL API для биржи '{exchange_name}' получен.")
@@ -74,15 +74,15 @@ class DatabaseManager:
             logger.warning(f"Биржа '{exchange_name}' не найдена.")
             return None
 
-    async def save_price(self, currency_price: currencyprice) -> None:
+    async def save_price(self, currency_price: CurrencyPrice) -> None:
         """Сохраняет информацию о ценах валют в базе данных.
 
         Args:
             currency_price (currencyprice): Объект, содержащий информацию о ценах валют.
         """
         query = """
-            INSERT INTO currency_price (currency_pair_id, price, source, datetime)
-            VALUES ($1, $2, $3, $4);
+            insert into currency_price (currency_pair_id, price, source, datetime)
+            values ($1, $2, $3, $4);
         """
         await self.conn.execute(query,
                                 currency_price.currency_pair_id,
