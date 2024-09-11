@@ -90,3 +90,25 @@ class DatabaseManager:
                                 currency_price.source,
                                 currency_price.datetime)
         logger.info(f"Цены валют сохранены: {currency_price}")
+
+    async def fetch_latest_price(self, currency_pair_id: int) -> Optional[CurrencyPrice]:
+        """Получает последнюю сохраненную цену для заданной валютной пары.
+
+        Args:
+            currency_pair_id: ID валютной пары.
+
+        Returns:
+            Объект CurrencyPrice с последней ценой или None, если цена не найдена.
+        """
+        query = """
+            select price, source, datetime
+            from currency_price
+            where currency_pair_id = $1 
+            order by datetime DESC 
+            limit 1;
+        """
+        row = await self.conn.fetchrow(query, currency_pair_id)
+        if row:
+            return CurrencyPrice(currency_pair_id=currency_pair_id, price=row["price"], source=row["source"],
+                                 datetime=row["datetime"])
+        return None
