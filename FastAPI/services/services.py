@@ -8,7 +8,7 @@ import logging
 from typing_extensions import Optional
 
 from repositories import DatabaseManager
-from models import currency, currencyprice
+from models import Currency, CurrencyPair, CurrencyPrice
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -27,7 +27,7 @@ class currencyservice:
         """
         await self.db_manager.connect()
         self.session = aiohttp.ClientSession()
-        await asyncio.create_task(self.fetch_prices())
+        asyncio.create_task(self.fetch_prices())
 
     async def close(self):
         """Закрытие бд
@@ -68,7 +68,7 @@ class currencyservice:
             binance_url = await self.db_manager.fetch_exchange_url('Binance')
             price_data = await self.get_binance_price(pair, binance_url)
             if price_data:
-                currency_price = currencyprice(
+                currency_price = CurrencyPrice(
                     currency_pair_id=currency_pair_id,
                     price=float(price_data['price']),
                     source="Binance",
@@ -81,7 +81,7 @@ class currencyservice:
             bybit_url = await self.db_manager.fetch_exchange_url('Bybit')
             price_data = await self.get_bybit_price(pair, bybit_url)
             if price_data:
-                currency_price = currencyprice(
+                currency_price = CurrencyPrice(
                     currency_pair_id=currency_pair_id,
                     price=float(price_data['price']),
                     source="Bybit",
@@ -152,12 +152,28 @@ class currencyservice:
         """
         return await self.db_manager.fetch_currency_pairs()
 
-    async def get_latest_price(self, currency_pair: str)-> Optional[Dict[str, Any]]:
-        """Получение последней цены для заданной валютной пары
+    async def get_latest_price(self, currency_pair: str) -> Optional[CurrencyPrice]:
+        """Получает последнюю цену для заданной валютной пары.
+
         Arg:
-            param currency_pair: Код валютной пары
+            currency_pair: Строка, представляющая валютную пару (например, 'BTCUSDT').
         Return:
-            Optional[Dict[str, Any]]: Словарь с информацией о последней цене,
-            или None, если цена не доступна.
+            Объект CurrencyPrice с последней ценой или None, если цена не найдена.
         """
-        return await self.db_manager.fetch_currency_pairs()
+        logger.info(f"Запрос последней цены для валютной пары: {currency_pair}")
+
+        # Получаем ID валютной пары из базы данных
+        currency_pair_id = await self.db_manager.fetch_currency_pair_id(currency_pair)
+        if currency_pair_id is None:
+            logger.warning(f"Валютная пара {currency_pair} не найдена в базе данных.")
+            return None
+
+        # Получаем последнюю цену из базы данных
+        latest_price = await self.db_manager.fetch_latest_price(currency_pair_id)  
+
+        if latest_price is None:
+            logger.warning(f"Последняя цена для валютной пары {currency_pair} не найдена.")
+        else:
+            logger.info(f"Последняя цена для {currency_pair}: {latest_price.price}")
+
+        return latest_price
