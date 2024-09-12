@@ -8,13 +8,13 @@ import logging
 from typing_extensions import Optional
 
 from repositories import DatabaseManager
-from models import Currency, CurrencyPair, CurrencyPrice
+from models import CurrencyPrice
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class currencyservice:
+class CurrencyService:
     def __init__(self):
 
         self.db_manager = DatabaseManager()
@@ -169,7 +169,7 @@ class currencyservice:
             return None
 
         # Получаем последнюю цену из базы данных
-        latest_price = await self.db_manager.fetch_latest_price(currency_pair_id)  
+        latest_price = await self.db_manager.fetch_latest_price(currency_pair_id)  # Получаем последнюю цену
 
         if latest_price is None:
             logger.warning(f"Последняя цена для валютной пары {currency_pair} не найдена.")
