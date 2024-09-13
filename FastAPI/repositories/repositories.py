@@ -78,7 +78,7 @@ class DatabaseManager:
         """Сохраняет информацию о ценах валют в базе данных.
 
         Args:
-            currency_price (currencyprice): Объект, содержащий информацию о ценах валют.
+            currency_price (CurrencyPrice): Объект, содержащий информацию о ценах валют.
         """
         query = """
             insert into currency_price (currency_pair_id, price, source, datetime)
@@ -109,6 +109,8 @@ class DatabaseManager:
         """
         row = await self.conn.fetchrow(query, currency_pair_id)
         if row:
+            logger.info(f"Последняя цена для валютной пары ID '{currency_pair_id}' получена.")
             return CurrencyPrice(currency_pair_id=currency_pair_id, price=row["price"], source=row["source"],
                                  datetime=row["datetime"])
+        logger.warning(f"Цены для валютной пары ID '{currency_pair_id}' не найдены.")
         return None
