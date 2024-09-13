@@ -113,37 +113,41 @@ class CurrencyService:
             logger.error(f"Error fetching data from Binance for {pair}: {e}")
             return None
 
-    async def get_bybit_price(self, pair: str, bybit_url: str)-> Optional[Dict[str, Any]]:
-        """Получаем цену криптовалюты с биржи Bybit
+    async def get_bybit_price(self, pair: str, bybit_url: str) -> Optional[Dict[str, Any]]:
+        """Получаем цену криптовалюты с биржи Bybit.
+
         Arg:
-            param pair: Список строк, представляющих валютные пары, для которых нужно получить цены.
-            param bybit_url: Ссылка на API для биржи Bybit
+            param pair: Строка, представляющая валютную пару, для которой нужно получить цену.
+            param bybit_url: Ссылка на API для биржи Bybit.
+
         Return:
             Optional[Dict[str, Any]]: Словарь с информацией о валюте и последней цене по бирже Bybit,
-            или None, если цена не доступна.
+            или None, если цена недоступна.
         """
         params = {'symbol': pair}
+
         try:
             async with self.session.get(bybit_url, params=params, ssl=False) as response:
                 if response.status == 200:
                     data = await response.json()
-                    # Проверка на ключ 'result'
-                    if 'result' in data and isinstance(data['result'], dict):
-                        # Проверка наличия ключа 'price' в 'result'
-                        if 'price' in data['result']:
-                            return data['result']
-                        else:
-                            logger.error("Response does not contain 'price': %s", data['result'])
-                            return None
+
+                    if 'result' in data:
+                        result = data['result']  # Достаем результат
+
+                        if 'price' in result:
+                            logger.info(f"Получена цена для пары {pair}: {result['price']}")
+                            return result  # Возвращаем весь результат, о цене и других полях
+
+                        logger.error("Response does not contain 'price': %s", result)
                     else:
                         logger.error("Response does not contain 'result' or it is invalid: %s", data)
-                        return None
                 else:
                     logger.error("Failed to fetch data from Bybit: %s", response.status)
-                    return None
+
         except Exception as e:
             logger.error("Error fetching data from Bybit: %s", e)
-            return None
+
+        return None
 
     async def get_currency_pairs(self) -> List[str]:
         """Получение списка валютных пар из базы данных.
