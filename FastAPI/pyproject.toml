@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "docker"
+version = "0.1.0"
+description = "My project"
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.0"
+python-dotenv = "^1.0.1"
+sqlalchemy = "^2.0.35"
+asyncpg = "^0.29.0"
+pydantic = "^2.9.2"
+alembic = "^1.13.2"
+requests = "^2.32.3"
+aiohttp = "^3.10.5"
+uvicorn = "^0.30.6"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
