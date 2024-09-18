@@ -1,0 +1,6 @@
+    __pycache__/
+    *.pyc
+    .env
+    .venv/
+    docker-compose.override.yml
+    **/__pycache__/*
