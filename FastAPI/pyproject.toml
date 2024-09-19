@@ -1,24 +1,20 @@
 [tool.poetry]
-name = "docker"
+name = "имя_проекта"
 version = "0.1.0"
-description = "My project"
-authors = ["Your Name <you@example.com>"]
-license = "MIT"
-readme = "README.md"
+description = "Краткое описание вашего проекта"
+authors = ["Ваше Имя <ваш.email@example.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.8" 
+uvicorn = "^0.30.6"
 fastapi = "^0.115.0"
 python-dotenv = "^1.0.1"
-sqlalchemy = "^2.0.35"
-asyncpg = "^0.29.0"
 pydantic = "^2.9.2"
-alembic = "^1.13.2"
-requests = "^2.32.3"
+logging = "^0.4.9.6"
+asyncpg = "^0.29.0"
 aiohttp = "^3.10.5"
-uvicorn = "^0.30.6"
-
+asyncio = "^3.4.3"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
