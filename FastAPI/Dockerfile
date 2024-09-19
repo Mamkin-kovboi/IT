@@ -1,24 +1,17 @@
-# Используем официальный образ Python
 FROM python:3.9
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
+# Копируем файлы
+COPY pyproject.toml poetry.lock ./
+RUN pip install poetry && poetry config virtualenvs.create false && poetry install --no-dev
 
-RUN pip install poetry
+COPY ./app ./app
+COPY .env ./
 
-# Копируем файлы зависимостей
-COPY pyproject.toml poetry.lock* ./
+# Экспонируем порт
+EXPOSE 8000
 
-# Устанавливаем зависимости
-RUN poetry install --no-dev -vvv
-
-# Копируем все файлы приложения
-COPY . .
-
-
-RUN poetry config virtualenvs.create false \
-    && poetry install --only main
-
-# Указываем команду для запуска приложения
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Команда для запуска сервера
+CMD ["uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", "8000", "--reload"]
