@@ -1,7 +1,8 @@
+import os
 from typing import Optional, List
 import asyncpg
 import logging
-from config import DATABASE_CONFIG
+from config import Database
 from models import CurrencyPrice
 
 # Настройка логирования
@@ -16,7 +17,7 @@ class DatabaseManager:
     async def connect(self) -> None:
         """Соединение с дб"""
         try:
-            self.conn = await asyncpg.connect(**DATABASE_CONFIG)
+            self.conn = await asyncpg.connect(dsn=os.getenv("Database"))
             logger.info("Успешное соединение с базой данных.")
         except Exception as e:
             logger.error(f"Ошибка при соединении с базой данных: {e}")
