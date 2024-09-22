@@ -5,7 +5,7 @@ description = "Краткое описание вашего проекта"
 authors = ["Ваше Имя <ваш.email@example.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8" 
+python = "^3.8"
 uvicorn = "^0.30.6"
 fastapi = "^0.115.0"
 python-dotenv = "^1.0.1"
