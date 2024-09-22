@@ -17,7 +17,7 @@ class DatabaseManager:
     async def connect(self) -> None:
         """Соединение с дб"""
         try:
-            self.conn = await asyncpg.connect(dsn=os.getenv("Database"))
+            self.conn = await asyncpg.connect(dsn=os.getenv("DATABASE_URL"))
             logger.info("Успешное соединение с базой данных.")
         except Exception as e:
             logger.error(f"Ошибка при соединении с базой данных: {e}")
