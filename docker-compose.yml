@@ -23,5 +23,11 @@ services:
     ports:
       - "5433:5432"
 
+  app:
+    build: .
+    volumes:
+      - ./migrations:/migrations
+    depends_on:
+      - db
 volumes:
   db_data:
