@@ -10,6 +10,9 @@ RUN pip install poetry && poetry config virtualenvs.create false && poetry insta
 COPY ./app ./app
 COPY .env ./
 
+COPY entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["python", "app.py"]
 # Экспонируем порт
 EXPOSE 8000
 

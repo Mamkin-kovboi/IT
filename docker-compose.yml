@@ -23,11 +23,12 @@ services:
     ports:
       - "5433:5432"
 
-  app:
+  migration:
     build: .
-    volumes:
-      - ./migrations:/migrations
     depends_on:
       - db
+    environment:
+      DATABASE_URL: postgresql://postgres:223456@db:5432/postgres
+    command: python -m yoyo apply ${DATABASE_URL}
 volumes:
   db_data:
