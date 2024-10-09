@@ -3,6 +3,10 @@ FROM python:3.9
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y gcc python3-dev
+RUN apt-get update && apt-get install -y netcat-openbsd
+
+
 # Копируем входной скрипт
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
@@ -17,7 +21,7 @@ COPY ./app ./app
 COPY .env ./
 
 # Устанавливаем yoyo-migrate
-RUN pip install yoyo-migrate
+RUN pip install yoyo-migrations
 
 # Команда для запуска сервера с миграцией
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

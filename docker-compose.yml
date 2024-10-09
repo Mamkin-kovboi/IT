@@ -13,10 +13,12 @@ services:
 
   db:
     image: postgres:13
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 223456
-      POSTGRES_DB: some_db
+      POSTGRES_USER: POSTGRES__USER
+      POSTGRES_PASSWORD: POSTGRES__PASSWORD
+      POSTGRES_DB: POSTGRES__DATABASE_NAME
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
