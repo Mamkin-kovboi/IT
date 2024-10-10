@@ -21,7 +21,7 @@ steps = [
         """
      ),
     step(
-        """
+ """
             insert into currency_pair (currency_from_id, currency_to_id, exchanger_id) values
                 ((select id from currency where name='BTCUSDT'),
                 (select id from currency where name='DOGEUSDT'),
@@ -38,6 +38,9 @@ steps = [
                 ((select id from currency where name='BNBUSDT'),
                 (select id from currency where name='ETHUSDT'),
                 (select id from exchanger where name='Binance'));
+        """,
+        """
+            drop table if exists currency_pair cascade;
         """
     ),
     step(
@@ -52,6 +55,9 @@ steps = [
                 currency_pair on currency_pair.currency_from_id = currency.id
             inner join
                 exchanger on currency_pair.exchanger_id = exchanger.id;
+        """,
+        """
+            drop table if exists currency_pair cascade;
         """
     )
 
