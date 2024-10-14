@@ -81,10 +81,12 @@ class DatabaseManager:
         Args:
             currency_price (CurrencyPrice): Объект, содержащий информацию о ценах валют.
         """
-        query = """
-            insert into currency_price (currency_pair_id, price, source, datetime)
-            values ($1, $2, $3, $4);
-        """
+        query = (
+            """
+                insert into currency_price (currency_pair_id, price, source, datetime)
+                values ($1, $2, $3, $4);
+            """
+        )
         await self.conn.execute(query,
                                 currency_price.currency_pair_id,
                                 currency_price.price,
@@ -101,13 +103,15 @@ class DatabaseManager:
         Returns:
             Объект CurrencyPrice с последней ценой или None, если цена не найдена.
         """
-        query = """
-            select price, source, datetime
-            from currency_price
-            where currency_pair_id = $1 
-            order by datetime DESC 
-            limit 1;
-        """
+        query = (
+            """
+                select price, source, datetime
+                from currency_price
+                where currency_pair_id = $1 
+                order by datetime DESC 
+                limit 1;
+            """
+        )
         row = await self.conn.fetchrow(query, currency_pair_id)
         if row:
             logger.info(f"Последняя цена для валютной пары ID '{currency_pair_id}' получена.")
