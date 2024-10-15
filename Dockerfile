@@ -7,8 +7,8 @@ RUN apt-get update && apt-get install -y gcc python3-dev
 RUN apt-get update && apt-get install -y netcat-openbsd
 
 # Копируем входной скрипт
-COPY entrypoint.py /usr/local/bin/entrypoint.py
-RUN chmod +x /usr/local/bin/entrypoint.py
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Копируем файлы
 COPY pyproject.toml poetry.lock ./
@@ -23,4 +23,4 @@ COPY .env ./
 RUN pip install yoyo-migrations
 
 # Команда для запуска сервера с миграцией
-ENTRYPOINT ["python", "/usr/local/bin/entrypoint.py"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
