@@ -1,8 +1,5 @@
-import uvicorn
-from requests import Response
-
-from models import CurrencyPrice
-from services import CurrencyService
+from app.models import CurrencyPrice
+from app.services import CurrencyService
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 

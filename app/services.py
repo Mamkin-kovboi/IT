@@ -7,8 +7,8 @@ import logging
 
 from typing_extensions import Optional
 
-from repositories import DatabaseManager
-from models import CurrencyPrice
+from app.repositories import DatabaseManager
+from app.models import CurrencyPrice
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)

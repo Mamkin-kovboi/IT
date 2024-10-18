@@ -2,8 +2,7 @@ import os
 from typing import Optional, List
 import asyncpg
 import logging
-from config import Database
-from models import CurrencyPrice
+from app.models import CurrencyPrice
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -34,7 +33,7 @@ class DatabaseManager:
         Returns:
             List[str]: Список имен валютных пар.
         """
-        query = "select name from currency;"
+        query = "select name from myschema.currency;"
         rows = await self.conn.fetch(query)
         logger.info("Получены валютные пары из базы данных.")
         return [row['name'] for row in rows]
@@ -48,7 +47,7 @@ class DatabaseManager:
         Returns:
             Optional[int]: Идентификатор валютной пары или None, если не найдено.
         """
-        query = f"select id from currency where name = '{pair}';"
+        query = f"select id from myschema.currency where name = '{pair}';"
         row = await self.conn.fetchrow(query)
         if row:
             logger.info(f"Валютная пара '{pair}' найдена, ID: {row['id']}.")
@@ -66,7 +65,7 @@ class DatabaseManager:
         Returns:
             Optional[str]: URL API биржи или None, если обменник не найден.
         """
-        query = f"select api_url from exchanger where name = '{exchange_name}';"
+        query = f"select api_url from myschema.exchanger where name = '{exchange_name}';"
         row = await self.conn.fetchrow(query)
         if row:
             logger.info(f"URL API для биржи '{exchange_name}' получен.")
@@ -83,7 +82,7 @@ class DatabaseManager:
         """
         query = (
             f"""
-                insert into currency_price (currency_pair_id, price, source, datetime)
+                insert into myschema.currency_price (currency_pair_id, price, source, datetime)
                 values ({currency_price.currency_pair_id}, {currency_price.price}, '{currency_price.source}', '{currency_price.datetime}');
             """
         )
@@ -102,7 +101,7 @@ class DatabaseManager:
         query = (
             """
                 select price, source, datetime
-                from currency_price
+                from myschema.currency_price
                 where currency_pair_id = $1 
                 order by datetime DESC 
                 limit 1;

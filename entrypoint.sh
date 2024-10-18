@@ -1,6 +1,5 @@
 #!/bin/sh
 
-
 # Запуск миграций
 echo "Применение миграций..."
 if ! yoyo apply --database "$DB_URL" "$MIGRATION_PATH"; then
@@ -10,9 +9,12 @@ fi
 
 echo "Миграции успешно применены."
 
+# Установка рабочей директории
+cd ./ || exit
+
 # Запуск приложения
 echo "Запуск приложения..."
-if ! poetry run python3.12 uvicorn main:app --host 0.0.0.0 --port 8000; then
+if ! poetry run   uvicorn app.main:app --host 0.0.0.0 --port 8000; then
     echo "Ошибка при запуске приложения."
     exit 1
 fi
