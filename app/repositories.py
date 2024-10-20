@@ -33,8 +33,12 @@ class DatabaseManager:
         Returns:
             List[str]: Список имен валютных пар.
         """
-        query = "select name from myschema.currency;"
-        rows = await self.conn.fetch(query)
+        q = """
+                select 
+                    name 
+                from currency
+        """
+        rows = await self.conn.fetch(q)
         logger.info("Получены валютные пары из базы данных.")
         return [row['name'] for row in rows]
 
@@ -47,8 +51,13 @@ class DatabaseManager:
         Returns:
             Optional[int]: Идентификатор валютной пары или None, если не найдено.
         """
-        query = f"select id from myschema.currency where name = '{pair}';"
-        row = await self.conn.fetchrow(query)
+        q = f"""
+                select 
+                    id 
+                from currency 
+                where name = '{pair}';
+        """
+        row = await self.conn.fetchrow(q)
         if row:
             logger.info(f"Валютная пара '{pair}' найдена, ID: {row['id']}.")
             return row['id']
@@ -65,8 +74,13 @@ class DatabaseManager:
         Returns:
             Optional[str]: URL API биржи или None, если обменник не найден.
         """
-        query = f"select api_url from myschema.exchanger where name = '{exchange_name}';"
-        row = await self.conn.fetchrow(query)
+        q = f"""
+                select 
+                    api_url 
+                from exchanger
+                where name = '{exchange_name}';
+        """
+        row = await self.conn.fetchrow(q)
         if row:
             logger.info(f"URL API для биржи '{exchange_name}' получен.")
             return row['api_url']
@@ -80,13 +94,13 @@ class DatabaseManager:
         Args:
             currency_price (CurrencyPrice): Объект, содержащий информацию о ценах валют.
         """
-        query = (
-            f"""
-                insert into myschema.currency_price (currency_pair_id, price, source, datetime)
-                values ({currency_price.currency_pair_id}, {currency_price.price}, '{currency_price.source}', '{currency_price.datetime}');
-            """
-        )
-        await self.conn.execute(query)
+        q = f"""
+                 insert into currency_price(
+                     currency_pair_id, price, source, datetime
+                 ) values (
+                     {currency_price.currency_pair_id}, {currency_price.price}, '{currency_price.source}', '{currency_price.datetime}');
+        """
+        await self.conn.execute(q)
         logger.info(f"Цены валют сохранены: {currency_price}")
 
     async def fetch_latest_price(self, currency_pair_id: int) -> Optional[CurrencyPrice]:
@@ -98,16 +112,15 @@ class DatabaseManager:
         Returns:
             Объект CurrencyPrice с последней ценой или None, если цена не найдена.
         """
-        query = (
-            """
-                select price, source, datetime
-                from myschema.currency_price
-                where currency_pair_id = $1 
-                order by datetime DESC 
-                limit 1;
-            """
-        )
-        row = await self.conn.fetchrow(query, currency_pair_id)
+        q = """
+                 select 
+                     price, source, datetime
+                 from currency_price
+                 where currency_pair_id = $1 
+                 order by datetime DESC 
+                 limit 1;
+        """
+        row = await self.conn.fetchrow(q, currency_pair_id)
         if row:
             logger.info(f"Последняя цена для валютной пары ID '{currency_pair_id}' получена.")
             return CurrencyPrice(currency_pair_id=currency_pair_id, price=row["price"], source=row["source"],

@@ -9,12 +9,7 @@ __depends__ = {}
 steps = [
     step(
         """
-        CREATE SCHEMA myschema;
-        """,
-    ),
-    step(
-  """
-            create table if not exists myschema.currency (
+            create table if not exists currency (
                 id serial primary key,
                 name varchar(255) not null,
                 symbol varchar(255) not null
@@ -27,7 +22,7 @@ steps = [
     ),
     step(
         """
-            insert into myschema.currency (name, symbol)
+            insert into currency (name, symbol)
             values ('BTCUSDT', 'BTC'),
                    ('ETHUSDT', 'ETH'),
                    ('BNBUSDT', 'BNB'),
