@@ -12,13 +12,15 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Копируем файлы
 COPY pyproject.toml poetry.lock ./
-COPY migrations  ./migrations
+COPY migrations  ./migrations .env ./
+
+# Запуск и установка зависимостей
 RUN pip install poetry && \
     poetry config virtualenvs.create false && \
     poetry install --no-dev
 
 COPY ./app ./app
-COPY .env ./
+
 
 # Устанавливаем yoyo-migrate
 RUN pip install yoyo-migrations

@@ -29,5 +29,6 @@ steps = [
                    ('DOGEUSDT', 'DOGE')
             on conflict do nothing;
         """
+
     )
 ]
